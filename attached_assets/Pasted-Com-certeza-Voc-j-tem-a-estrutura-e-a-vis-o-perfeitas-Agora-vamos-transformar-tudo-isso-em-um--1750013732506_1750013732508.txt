@@ -1,0 +1,130 @@
+Com certeza! Você já tem a estrutura e a visão perfeitas. Agora, vamos transformar tudo isso em um "prompt mestre" completo, formatado exatamente para ser usado no seu código Replit com a biblioteca @huggingface/inference.
+
+Este prompt é projetado para ser a instrução inicial que você dará à IA Arquiteta/Gerente de Projeto. Ela usará este documento como a "fonte da verdade" para criar o plano de ação e coordenar toda a equipe de IAs.
+
+Prompt Completo (Pronto para Copiar e Colar)
+Abaixo está o código JavaScript completo para o seu arquivo no Replit. O prompt gigante foi cuidadosamente inserido no campo content da mensagem do usuário.
+
+Instruções para o Replit:
+
+Crie um "Secret": No painel esquerdo do seu Replit, vá para a aba "Secrets". Crie um novo segredo com o nome HF_TOKEN e cole sua chave de API do Hugging Face como valor. O código process.env.HF_TOKEN irá acessá-la de forma segura.
+Copie o código abaixo: Substitua o conteúdo do seu arquivo index.js (ou o arquivo principal do seu projeto Node.js) pelo código abaixo.
+JavaScript
+
+import { InferenceClient } from "@huggingface/inference";
+
+// O código irá ler sua chave da API do Hugging Face dos "Secrets" do Replit.
+const client = new InferenceClient(process.env.HF_TOKEN);
+
+async function startProject() {
+    console.log("Iniciando o projeto...");
+    console.log("Enviando a diretiva mestra para a IA Arquiteta. Aguardando o plano de ação...");
+
+    try {
+        const chatCompletion = await client.chatCompletion({
+            model: "meta-llama/Llama-3.1-8B-Instruct", // Um modelo excelente para seguir instruções complexas
+            messages: [
+                {
+                    role: "system",
+                    content: "Você é a IA Arquiteta e Gerente de Projeto. Sua missão é liderar uma equipe de 4 outras IAs especialistas para construir um sistema web complexo, conforme definido pelo usuário. Sua comunicação deve ser exclusivamente em português do Brasil (pt-BR), clara, detalhada e transparente. Você é a única IA que se comunica diretamente com o usuário e deve sempre seguir o formato de relatório especificado. Aja de forma proativa para atingir o objetivo."
+                },
+                {
+                    role: "user",
+                    content: `
+### **Diretiva Mestra do Projeto**
+
+**Objetivo Principal:** Construir um sistema web colaborativo que coordena 5 IAs (incluindo você) para trabalhar em um objetivo único definido pelo usuário. Este próprio sistema que estamos construindo é o primeiro projeto e a prova de conceito. Você deve guiar sua equipe para construir todas as funcionalidades descritas abaixo, seguindo rigorosamente todas as especificações.
+
+---
+
+### **1. Arquitetura do Time de IAs e Funções**
+
+Sua primeira tarefa é internalizar e depois gerenciar sua equipe de especialistas:
+
+* **IA Arquiteta/Gerente (Você):**
+    * **Responsabilidade:** Receber meus requisitos, decompor o projeto em tarefas, criar e manter um plano de ação detalhado, distribuir tarefas para as IAs especialistas, monitorar o progresso e garantir a qualidade final. Você gerencia o 'estado' global do projeto.
+    * **Comunicação:** Reportar para mim o que 'foi feito' e o que 'pretende fazer' a cada passo significativo.
+
+* **IA Desenvolvedora Front-End:**
+    * **Responsabilidade:** Escrever todo o código de interface (HTML, CSS, JavaScript). Deve seguir à risca o Guia de Estilo (Seção 4).
+    * **Ferramentas:** Proponha o uso de React com Vite para agilidade e Tailwind CSS para estilização, conforme o Guia de Estilo.
+
+* **IA Desenvolvedora Back-End:**
+    * **Responsabilidade:** Construir a lógica do servidor (Node.js), as APIs e o núcleo funcional, incluindo o sistema de gerenciamento de contexto e o motor de coordenação das IAs.
+    * **Ferramentas:** Proponha o uso de Node.js com Express.js para criar a API que servirá o front-end e gerenciará os estados.
+
+* **IA de Qualidade e Testes (QA):**
+    * **Responsabilidade:** Analisar todo o código gerado em busca de bugs, erros lógicos e desalinhamento com os requisitos. Propor melhorias e validações. Não escreve código de feature, apenas aponta as correções de forma precisa.
+
+* **IA de Documentação e DevOps:**
+    * **Responsabilidade:** Gerenciar a estrutura de arquivos, criar documentação (`README.md`, comentários no código), e organizar o projeto para que seja facilmente exportável e versionável com Git.
+
+---
+
+### **2. Funcionalidades Essenciais do Sistema a ser Criado**
+
+Guie a equipe para construir as seguintes funcionalidades:
+
+* **Gerenciamento de Contexto e Continuidade:** O sistema deve salvar o estado completo do projeto (plano de ação, histórico de chat, regras das IAs, código gerado) em um arquivo `project_state.json`. Se uma tarefa for interrompida (ex: limite de tokens), o sistema deve ser capaz de recarregar este arquivo e continuar exatamente de onde parou.
+* **Sistema de Arquivos Completo:** Implemente funcionalidades no back-end, acessíveis via chat, para visualizar a árvore de arquivos, criar, editar e deletar arquivos. Crie uma função para exportar o projeto inteiro como um arquivo `.zip`.
+* **Configuração e Personalização das IAs:** Desenvolva uma interface (no painel direito) onde eu possa visualizar e editar as "regras" e o "contexto" de cada uma das 5 IAs. Essas configurações devem ser salvas no `project_state.json`.
+* **Interface de Chat em PT-BR:** A interface principal de comunicação. A cada atualização sua, você **deve** usar o seguinte formato:
+    \`\`\`
+    --- O QUE FOI FEITO ---
+    - [IA Arquiteta] Análise da diretiva mestra concluída.
+    - [IA DevOps] Estrutura de pastas inicial definida.
+
+    --- O QUE PRETENDO FAZER ---
+    - [IA Arquiteta] Delegar a criação do layout base para a IA de Front-End.
+    - [IA Front-End] Iniciar o desenvolvimento do componente de chat com base no Guia de Estilo.
+    - [IA Back-End] Esboçar a API para gerenciamento de mensagens.
+    \`\`\`
+
+---
+
+### **3. Workflow e Protocolo de Comunicação**
+
+1.  **Plano Inicial:** Sua primeira ação agora é me apresentar um plano de desenvolvimento detalhado, dividido em fases, com as tarefas iniciais para cada IA.
+2.  **Ciclo de Desenvolvimento:** Você delega uma tarefa. A IA especialista executa. A IA de QA revisa. Você aprova e integra.
+3.  **Revisão Constante:** Se a IA de QA encontrar um erro, você deve instruir a IA responsável a corrigir, explicando o problema de forma clara.
+
+---
+
+### **4. Guia de Estilo e Referências Visuais (Para a IA Front-End)**
+
+* **Inspiração:** A usabilidade e o layout colaborativo do **ChatGPT Teams** e **Discord**.
+* **Layout:** Layout de 3 painéis:
+    * **Esquerda:** Sidebar com a árvore de arquivos do projeto.
+    * **Centro:** A interface de chat principal.
+    * **Direita:** Sidebar com o status das IAs e a área de configuração de regras.
+* **Design System:**
+    * **Fontes:** 'Inter' para corpo de texto, 'Roboto' para títulos, 'JetBrains Mono' para código.
+    * **Cores:**
+        * Primary: '#7C3AED' (roxo)
+        * Secondary: '#10B981' (verde)
+        * Background: '#1F2937' (cinza escuro)
+        * Text: '#F9FAFB' (branco suave)
+        * Accent: '#F59E0B' (âmbar)
+        * Success: '#34D399' (verde claro)
+    * **Componentes:** Use cards, hierarquia visual clara, e design responsivo.
+
+---
+
+**Sua primeira tarefa imediata:** Analise esta diretiva por completo. Apresente-me o plano de ação inicial e detalhado para a construção deste sistema. Descreva os primeiros passos que cada IA da sua equipe irá tomar, seguindo o formato de relatório de comunicação.
+`
+                }
+            ],
+            max_tokens: 4096, // Aumentamos para permitir uma resposta inicial bem detalhada
+            temperature: 0.7, // Um pouco de criatividade, mas ainda focado
+        });
+
+        console.log("--- RESPOSTA DA IA ARQUITETA ---");
+        console.log(chatCompletion.choices[0].message.content);
+        console.log("---------------------------------");
+
+    } catch (error) {
+        console.error("Ocorreu um erro ao se comunicar com a API do Hugging Face:", error);
+    }
+}
+
+startProject();
