@@ -126,15 +126,25 @@ export class FileManager {
   }
 
   async initializeDefaultProjectStructure(projectId: number): Promise<void> {
-    const project = await storage.getProject(projectId);
+    // Check if already initialized
+    const existingFiles = await this.getProjectFileTree(projectId);
+    if (existingFiles.length > 0) return;
+
     const defaultStructure = [
+      // Estrutura de pastas completa
       { path: "client", type: "folder" },
       { path: "client/src", type: "folder" },
       { path: "client/src/components", type: "folder" },
+      { path: "client/src/components/ui", type: "folder" },
       { path: "client/src/pages", type: "folder" },
+      { path: "client/src/hooks", type: "folder" },
+      { path: "client/src/lib", type: "folder" },
       { path: "server", type: "folder" },
       { path: "server/services", type: "folder" },
       { path: "shared", type: "folder" },
+      { path: "docs", type: "folder" },
+      { path: "public", type: "folder" },
+      { path: "assets", type: "folder" },
       
       // Real project files
       { path: "client/src/App.tsx", type: "file", content: `import { Switch, Route } from "wouter";

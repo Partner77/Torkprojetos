@@ -15,6 +15,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   const clients = new Map<WebSocket, { projectId?: number }>();
 
+  // Pass WebSocket clients to AI Coordinator for broadcasting
+  aiCoordinator.setWebSocketClients(clients);
+
   wss.on('connection', (ws) => {
     clients.set(ws, {});
     
@@ -50,51 +53,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 }
               });
               
-              // Process with fallback response (quota issue)
+              // Process with AI Coordinator (now using local responses)
               try {
                 await aiCoordinator.processUserMessage(projectId, message.content);
-                
-                // Get and broadcast AI response
-                const messages = await storage.getMessagesByProject(projectId);
-                const latestAIMessage = messages[messages.length - 1];
-                
-                if (latestAIMessage && latestAIMessage.type !== 'user') {
-                  clients.forEach((clientData, client) => {
-                    if (clientData.projectId === projectId && client.readyState === WebSocket.OPEN) {
-                      client.send(JSON.stringify({
-                        type: 'new_message',
-                        message: latestAIMessage
-                      }));
-                    }
-                  });
-                }
               } catch (error) {
-                // Send fallback message if AI fails
-                const errorMessage = await storage.createMessage({
-                  projectId,
-                  agentId: 1, // Architect AI
-                  content: `Desculpe, estou com dificuldades técnicas (quota da API excedida). Vou trabalhar com respostas simuladas por enquanto.
-
---- O QUE FOI FEITO ---
-• [IA Arquiteta] Analisando sua solicitação
-• [IA DevOps] Sistema funcionando em modo local
-
---- O QUE PRETENDO FAZER ---
-• [IA Arquiteta] Coordenar equipe para ${message.content}
-• [IA Front-End] Implementar melhorias na interface
-• [IA Back-End] Otimizar funcionalidades do servidor`,
-                  type: "ai_response",
-                  metadata: { fallback: true, error: "quota_exceeded" },
-                });
-                
-                clients.forEach((clientData, client) => {
-                  if (clientData.projectId === projectId && client.readyState === WebSocket.OPEN) {
-                    client.send(JSON.stringify({
-                      type: 'new_message',
-                      message: errorMessage
-                    }));
-                  }
-                });
+                console.error('Error processing AI message:', error);
+                // The AI Coordinator now handles all broadcasting internally
               }
             }
             break;

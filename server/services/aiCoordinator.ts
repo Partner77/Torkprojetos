@@ -180,7 +180,10 @@ Distribuindo tarefas para a equipe agora...`,
       type: "ai_response",
       metadata: response.metadata,
     };
-    await storage.createMessage(aiMessage);
+    const savedMessage = await storage.createMessage(aiMessage);
+    
+    // Broadcast the agent's response automatically
+    this.broadcastMessage(projectId, savedMessage);
 
     // Update progress
     await storage.updateAiAgent(agent.id, { 
